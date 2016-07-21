@@ -11,8 +11,8 @@ hexChar = "*"
 compChar = "b"
 playerChar = "w"
 turn = "player"
-size = 4
-duration = 1
+size = 5
+duration = 10
 cmdQuit = False
 
 adjList = [[1,1], #upRight
@@ -115,26 +115,31 @@ def compMove(c):
     emptySpots = []
     winResults = []
     winResultsCount = []
+    timesSearched = []
     emptySpots = getSpots(hexChar, board)
     startTime = time.clock()
     count = 0
     for i in emptySpots:
         winResultsCount.append(0)
-##    print("Starting search for:", duration, "seconds")
+        timesSearched.append(0)
+    print("Starting search for:", duration, "seconds")
     while startTime + duration > time.clock() or len(winResults) == 0:
         spot = random.choice(emptySpots)
         if startTime + duration < time.clock() and len(winResults) > 0: break
         outcome = simulateGame(c, spot)
+        count += 1
         if outcome:
             if spot in winResults:
                 winResultsCount[winResults.index(spot)] += 1
             else:
                 winResults.append(spot)
-        count += 1
+        
+
             
     best = winResults[winResultsCount.index(max(winResultsCount))]
-##    print("Searched: " + str(count))
-##    print("Chosen position won:" + str(max(winResultsCount)) + "times")
+    
+    print("Searched: " + str(count))
+    print("Chosen position won: " + str(max(winResultsCount)) + " times")
     return best
 
 def simulateGame(simPlayer, startMove):
