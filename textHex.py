@@ -71,7 +71,7 @@ def checkPlayerWon(b):
         if row == playerChar:
             connectedToLeft.append([0,rowNum])
     playerSpots = getSpots(playerChar, b)
-    for i in playerSpots:
+    for i in range(len(playerSpots)+1):
         for spot in playerSpots:
             adjSpots = getAdj(playerChar, spot[0], spot[1], b)
             for adj in adjSpots:
@@ -94,7 +94,7 @@ def checkCompWon(b):
         if col[0] == compChar:
             connectedToBottom.append([colNum,0])
     compSpots = getSpots(compChar, b)
-    for i in compSpots:
+    for i in range(len(compSpots)+1):
         for spot in compSpots:
             adjSpots = getAdj(compChar, spot[0], spot[1], b)
             for adj in adjSpots:
@@ -147,16 +147,13 @@ def simulateGame(simPlayer, startMove):
 
     if simPlayer == compChar:
         while len(emptySpots) > 0:
-            
             rPlayerMove = random.choice(emptySpots)
             simBoard[rPlayerMove[0]][rPlayerMove[1]] = playerChar
             if checkPlayerWon(simBoard):
                 return False
-            
             emptySpots = getSpots(hexChar, simBoard)
-            if len(emptySpots) > 0:
-                rCompMove = random.choice(emptySpots)
-                simBoard[rCompMove[0]][rCompMove[1]] = compChar
+            rCompMove = random.choice(emptySpots)
+            simBoard[rCompMove[0]][rCompMove[1]] = compChar
             if checkCompWon(simBoard):
                 return True
             emptySpots = getSpots(hexChar, simBoard)
@@ -167,9 +164,9 @@ def simulateGame(simPlayer, startMove):
             simBoard[rPlayerMove[0]][rPlayerMove[1]] = compChar
             if checkCompWon(simBoard):
                 return False
-            if len(emptySpots) > 0:
-                rCompMove = random.choice(emptySpots)
-                simBoard[rCompMove[0]][rCompMove[1]] = playerChar
+            emptySpots = getSpots(hexChar, simBoard)
+            rCompMove = random.choice(emptySpots)
+            simBoard[rCompMove[0]][rCompMove[1]] = playerChar
             if checkPlayerWon(simBoard):
                 return True
             emptySpots = getSpots(hexChar, simBoard)
