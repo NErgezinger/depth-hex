@@ -14,12 +14,6 @@ turn = "player"
 size = 4
 duration = 1
 cmdQuit = False
-adjListo = [[0,1], #upRight
-           [1,0], #right
-           [1,-1],#downRight
-           [0,-1],#downLeft
-           [-1,0],#left
-           [-1,1]]#upLeft
 
 adjList = [[1,1], #upRight
            [1,0], #right
