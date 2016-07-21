@@ -1,7 +1,8 @@
+#TESTING
 version = 2.5
 import random
 import time
-import os
+import sys
 from copy import deepcopy
 # import numpy
 # import scipy.stats
@@ -121,7 +122,7 @@ def compMove(c):
     for i in possibleSpots:
         winResultsCount.append(0)
         timesSearched.append(0)
-    print("Starting search for:", duration, "seconds")
+##    print("Starting search for:", duration, "seconds")
     while startTime + duration > time.clock():
         spot = random.choice(possibleSpots)
         outcome = simulateGame(c, spot)
@@ -138,9 +139,13 @@ def compMove(c):
             best = spot
             bestWinRate = winRate
             
-    print("Searched: " + str(count))
-    print("Chosen position won: " + str(max(winResultsCount)) + " times")
-    return best
+    sys.stderr.write("Searched: " + str(count) + "\n")
+    sys.stderr.write(str(best) + " won " + str(bestWinRate * 100) +"% of the time\n")
+
+    if len(best) > 0:
+        return best
+    else:
+        return random.choice(possibleSpots)
 
 def simulateGame(simPlayer, startMove):
     simBoard = deepcopy(board)
@@ -177,8 +182,6 @@ def simulateGame(simPlayer, startMove):
                 return True
             emptySpots = getSpots(hexChar, simBoard)
 
-##    print("Simulation board is full, but no winner. This shouldn't happen")
-
 def play(c, ac):
     acl = [0,0]
     acl[0] = ord(ac[0]) - 96
@@ -191,6 +194,7 @@ def convertMove(move):
     move[1] = str(move[1])
     s = "".join(move)
     return s
+
 
 while not cmdQuit:
     cmd = input().split(" ")
