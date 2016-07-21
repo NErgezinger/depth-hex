@@ -1,5 +1,3 @@
-#BRANCH TESTING
-
 version = 2.5
 import random
 import time
@@ -114,32 +112,32 @@ def checkCompWon(b):
     
 def compMove(c):
     global duration
-    emptySpots = []
-    winResults = []
+    possibleSpots = []
     winResultsCount = []
     timesSearched = []
-    emptySpots = getSpots(hexChar, board)
+    possibleSpots = getSpots(hexChar, board)
     startTime = time.clock()
     count = 0
-    for i in emptySpots:
+    for i in possibleSpots:
         winResultsCount.append(0)
         timesSearched.append(0)
     print("Starting search for:", duration, "seconds")
-    while startTime + duration > time.clock() or len(winResults) == 0:
-        spot = random.choice(emptySpots)
-        if startTime + duration < time.clock() and len(winResults) > 0: break
+    while startTime + duration > time.clock():
+        spot = random.choice(possibleSpots)
         outcome = simulateGame(c, spot)
         count += 1
         if outcome:
-            if spot in winResults:
-                winResultsCount[winResults.index(spot)] += 1
-            else:
-                winResults.append(spot)
-        
+            winResultsCount[possibleSpots.index(spot)] += 1
+        timesSearched[possibleSpots.index(spot)] += 1
 
+    best = []
+    bestWinRate = 0
+    for i,spot in enumerate(possibleSpots):
+        winRate = (winResultsCount[i] / timesSearched[i])
+        if winRate > bestWinRate:
+            best = spot
+            bestWinRate = winRate
             
-    best = winResults[winResultsCount.index(max(winResultsCount))]
-    
     print("Searched: " + str(count))
     print("Chosen position won: " + str(max(winResultsCount)) + " times")
     return best
