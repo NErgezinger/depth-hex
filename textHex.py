@@ -173,34 +173,6 @@ def simulateGame(simPlayer, startMove):
             emptySpots = getSpots(hexChar, simBoard)
 
 ##    print("Simulation board is full, but no winner. This shouldn't happen")
-    
-
-##def main():
-##    global turn
-##    global gameWon
-##    if turn == "player":
-##        printBoard(board)
-##        inputCoord = list(map(int, input("Enter coordinates: (x,y): ").split(".")))
-##        while not board[inputCoord[0]-1][inputCoord[1]-1] == hexChar:
-##            inputCoord = list(map(int, input("Enter coordinates: (x,y): ").split(".")))
-##        changeColour(playerChar, inputCoord[0]-1, inputCoord[1]-1)
-####        moveCoord = compMove(playerChar)
-####        changeColour(playerChar, moveCoord[0], moveCoord[1])
-##        printBoard(board)
-##        if checkPlayerWon(board):
-##            print("WHITE WINS!")
-##            printBoard(board)
-##            gameWon = True
-##        turn = "comp"
-##    elif turn == "comp":
-##        moveCoord = compMove(compChar)
-##        changeColour(compChar, moveCoord[0], moveCoord[1])
-####        printBoard(board)
-##        if checkCompWon(board):
-##            print("BLACK WINS!")
-##            printBoard(board)
-##            gameWon = True
-##        turn = "player"   
 
 def play(c, ac):
     acl = [0,0]
@@ -228,24 +200,24 @@ while not cmdQuit:
         print()
     elif cmd[0] == "genmove":
         if cmd[1] == "b" or cmd[1] == "black":
-            if not checkPlayerWon(board) and not checkCompWon(board):
+            if checkPlayerWon(board) or checkCompWon(board):
+                print("= resign")
+                print()
+            else:
                 move = compMove(compChar)
                 changeColour(compChar, move[0], move[1])
                 fmove = convertMove(move)
                 print("= ", fmove)
                 print()
-            else:
+        elif cmd[1] == "w" or cmd[1] == "white":
+            if checkCompWon(board) or checkPlayerWon(board):
                 print("= resign")
                 print()
-        elif cmd[1] == "w" or cmd[1] == "white":
-            if not checkCompWon(board) and not checkPlayerWon(board):
+            else:
                 move = compMove(playerChar)
                 changeColour(playerChar, move[0], move[1])
                 fmove = convertMove(move)
                 print("= ", fmove)
-                print()
-            else:
-                print("= resign")
                 print()
         else:
             print("? invalid color")
