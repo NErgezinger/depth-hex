@@ -1,11 +1,9 @@
 #MASTER
-version = 2.5
+version = 0.1
 import random
 import time
 import sys
 from copy import deepcopy
-# import numpy
-# import scipy.stats
 board = []
 gameWon = False
 hexChar = "*"
@@ -23,7 +21,6 @@ adjList = [[1,1], #upRight
            [-1,0],#left
            [0,1]]#upLeft
 
-#board initialization
 def resetBoard(b):
     b = []
     for i in range(size):
@@ -32,7 +29,6 @@ def resetBoard(b):
             row.append(hexChar)
         b.append(row)
     return b
-        
 board = resetBoard(board)
 
 def printBoard(b):
@@ -53,7 +49,7 @@ def getAdj(colour,x,y,b):
         if 0 <= toCheck[0] <= size - 1 and 0 <= toCheck[1] <= size - 1:
             if b[toCheck[0]][toCheck[1]] == colour:
                 sameAdj.append(toCheck)
-##    print("(" + str(x) + "," + str(y) + ") is adj to " + str(sameAdj))
+##    sys.stderr.write("(" + str(x) + "," + str(y) + ") is adj to " + str(sameAdj))
     return sameAdj
 
 def getSpots(c,b):
@@ -108,7 +104,6 @@ def checkCompWon(b):
     for spot in topEdge:
         if spot in connectedToBottom:
             return True
-    
     return False
     
 def compMove(c):
@@ -122,7 +117,6 @@ def compMove(c):
     for i in possibleSpots:
         winResultsCount.append(0)
         timesSearched.append(0)
-##    print("Starting search for:", duration, "seconds")
     while startTime + duration > time.clock():
         spot = random.choice(possibleSpots)
         outcome = simulateGame(c, spot)
@@ -130,7 +124,6 @@ def compMove(c):
         if outcome:
             winResultsCount[possibleSpots.index(spot)] += 1
         timesSearched[possibleSpots.index(spot)] += 1
-
     best = []
     bestWinRate = 0
     for i,spot in enumerate(possibleSpots):
@@ -174,7 +167,6 @@ def simulateGame(simPlayer, startMove):
             simBoard[rPlayerMove[0]][rPlayerMove[1]] = compChar
             if checkCompWon(simBoard):
                 return False
-##            emptySpots = getSpots(hexChar, simBoard)
             if len(emptySpots) > 0:
                 rCompMove = random.choice(emptySpots)
                 simBoard[rCompMove[0]][rCompMove[1]] = playerChar
@@ -204,7 +196,6 @@ while not cmdQuit:
         print()
         
     elif cmd[0] == "version":
-##        print("=", str(version))
         print("= 1")
         print()
     elif cmd[0] == "genmove":
