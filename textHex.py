@@ -149,27 +149,33 @@ def simulateGame(simPlayer, startMove):
         while len(emptySpots) > 0:
             rPlayerMove = random.choice(emptySpots)
             simBoard[rPlayerMove[0]][rPlayerMove[1]] = playerChar
-            if checkPlayerWon(simBoard):
+            emptySpots.pop(emptySpots.index(rPlayerMove))
+
+            if len(emptySpots) > 0:
+                rCompMove = random.choice(emptySpots)
+                simBoard[rCompMove[0]][rCompMove[1]] = compChar
+                emptySpots.pop(emptySpots.index(rCompMove))
+                
+        if checkPlayerWon(simBoard):
                 return False
-            emptySpots = getSpots(hexChar, simBoard)
-            rCompMove = random.choice(emptySpots)
-            simBoard[rCompMove[0]][rCompMove[1]] = compChar
-            if checkCompWon(simBoard):
+        if checkCompWon(simBoard):
                 return True
-            emptySpots = getSpots(hexChar, simBoard)
             
     elif simPlayer == playerChar:
         while len(emptySpots) > 0:
-            rPlayerMove = random.choice(emptySpots)
-            simBoard[rPlayerMove[0]][rPlayerMove[1]] = compChar
-            if checkCompWon(simBoard):
-                return False
-            emptySpots = getSpots(hexChar, simBoard)
             rCompMove = random.choice(emptySpots)
-            simBoard[rCompMove[0]][rCompMove[1]] = playerChar
-            if checkPlayerWon(simBoard):
+            simBoard[rCompMove[0]][rCompMove[1]] = compChar
+            emptySpots.pop(emptySpots.index(rCompMove))
+
+            if len(emptySpots) > 0:
+                rPlayerMove = random.choice(emptySpots)
+                simBoard[rPlayerMove[0]][rPlayerMove[1]] = playerChar
+                emptySpots.pop(emptySpots.index(rPlayerMove))
+
+        if checkPlayerWon(simBoard):
                 return True
-            emptySpots = getSpots(hexChar, simBoard)
+        if checkCompWon(simBoard):
+                return False
 
 def play(c, ac):
     acl = [0,0]
