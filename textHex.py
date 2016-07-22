@@ -1,4 +1,4 @@
-#MASTER
+#TESTING
 version = 0.1
 import random
 import time
