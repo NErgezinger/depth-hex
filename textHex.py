@@ -3,6 +3,7 @@ import random
 import time
 import sys
 from copy import deepcopy
+import cProfile
 board = []
 gameWon = False
 hexChar = "*"
@@ -216,7 +217,8 @@ while not cmdQuit:
                 print("= resign")
                 print()
             else:
-                move = compMove(playerChar)
+                cProfile.run('compMove(playerChar)')
+                move = [2,2]
                 changeColour(playerChar, move[0], move[1])
                 fmove = convertMove(move)
                 print("= ", fmove)
