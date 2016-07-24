@@ -13,6 +13,7 @@ turn = "player"
 size = 5
 duration = 10
 cmdQuit = False
+profiling = False
 
 adjList = [[1,1], #upRight
            [1,0], #right
@@ -207,7 +208,10 @@ while not cmdQuit:
                 print("= resign")
                 print()
             else:
-                move = compMove(compChar)
+                if profiling:
+                    cProfile.run('compMove(playerChar)')
+                    move = [2,2]
+                else: move = compMove(compChar)
                 changeColour(compChar, move[0], move[1])
                 fmove = convertMove(move)
                 print("= ", fmove)
@@ -217,8 +221,10 @@ while not cmdQuit:
                 print("= resign")
                 print()
             else:
-                cProfile.run('compMove(playerChar)')
-                move = [2,2]
+                if profiling:
+                    cProfile.run('compMove(playerChar)')
+                    move = [2,2]
+                else: move = compMove(playerChar)
                 changeColour(playerChar, move[0], move[1])
                 fmove = convertMove(move)
                 print("= ", fmove)
