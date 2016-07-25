@@ -1,26 +1,19 @@
-#THIS IS THE OLD VERSION
-version = 2.5
+version = 3
 import random
 import time
-import os
+import sys
 from copy import deepcopy
-# import numpy
-# import scipy.stats
+import cProfile
 board = []
 gameWon = False
 hexChar = "*"
 compChar = "b"
 playerChar = "w"
 turn = "player"
-size = 4
-duration = 1
+size = 5
+duration = 10
 cmdQuit = False
-adjListo = [[0,1], #upRight
-           [1,0], #right
-           [1,-1],#downRight
-           [0,-1],#downLeft
-           [-1,0],#left
-           [-1,1]]#upLeft
+profiling = False
 
 adjList = [[1,1], #upRight
            [1,0], #right
@@ -29,7 +22,6 @@ adjList = [[1,1], #upRight
            [-1,0],#left
            [0,1]]#upLeft
 
-#board initialization
 def resetBoard(b):
     b = []
     for i in range(size):
@@ -38,7 +30,6 @@ def resetBoard(b):
             row.append(hexChar)
         b.append(row)
     return b
-        
 board = resetBoard(board)
 
 def printBoard(b):
@@ -59,7 +50,7 @@ def getAdj(colour,x,y,b):
         if 0 <= toCheck[0] <= size - 1 and 0 <= toCheck[1] <= size - 1:
             if b[toCheck[0]][toCheck[1]] == colour:
                 sameAdj.append(toCheck)
-##    print("(" + str(x) + "," + str(y) + ") is adj to " + str(sameAdj))
+##    sys.stderr.write("(" + str(x) + "," + str(y) + ") is adj to " + str(sameAdj))
     return sameAdj
 
 def getSpots(c,b):
@@ -81,7 +72,7 @@ def checkPlayerWon(b):
         if row == playerChar:
             connectedToLeft.append([0,rowNum])
     playerSpots = getSpots(playerChar, b)
-    for i in playerSpots:
+    for i in range(len(playerSpots)+1):
         for spot in playerSpots:
             adjSpots = getAdj(playerChar, spot[0], spot[1], b)
             for adj in adjSpots:
@@ -104,7 +95,7 @@ def checkCompWon(b):
         if col[0] == compChar:
             connectedToBottom.append([colNum,0])
     compSpots = getSpots(compChar, b)
-    for i in compSpots:
+    for i in range(len(compSpots)+1):
         for spot in compSpots:
             adjSpots = getAdj(compChar, spot[0], spot[1], b)
             for adj in adjSpots:
@@ -114,35 +105,41 @@ def checkCompWon(b):
     for spot in topEdge:
         if spot in connectedToBottom:
             return True
-    
     return False
     
 def compMove(c):
     global duration
-    emptySpots = []
-    winResults = []
+    possibleSpots = []
     winResultsCount = []
-    emptySpots = getSpots(hexChar, board)
+    timesSearched = []
+    possibleSpots = getSpots(hexChar, board)
     startTime = time.clock()
     count = 0
-    for i in emptySpots:
+    for i in possibleSpots:
         winResultsCount.append(0)
-##    print("Starting search for:", duration, "seconds")
-    while startTime + duration > time.clock() or len(winResults) == 0:
-        spot = random.choice(emptySpots)
-        if startTime + duration < time.clock() and len(winResults) > 0: break
+        timesSearched.append(0)
+    while startTime + duration > time.clock():
+        spot = random.choice(possibleSpots)
         outcome = simulateGame(c, spot)
-        if outcome:
-            if spot in winResults:
-                winResultsCount[winResults.index(spot)] += 1
-            else:
-                winResults.append(spot)
         count += 1
+        if outcome:
+            winResultsCount[possibleSpots.index(spot)] += 1
+        timesSearched[possibleSpots.index(spot)] += 1
+    best = []
+    bestWinRate = 0
+    for i,spot in enumerate(possibleSpots):
+        winRate = (winResultsCount[i] / timesSearched[i])
+        if winRate > bestWinRate:
+            best = spot
+            bestWinRate = winRate
             
-    best = winResults[winResultsCount.index(max(winResultsCount))]
-##    print("Searched: " + str(count))
-##    print("Chosen position won:" + str(max(winResultsCount)) + "times")
-    return best
+    sys.stderr.write("Searched: " + str(count) + "\n")
+    sys.stderr.write(str(best) + " won " + str(bestWinRate * 100) +"% of the time\n")
+
+    if len(best) > 0:
+        return best
+    else:
+        return random.choice(possibleSpots)
 
 def simulateGame(simPlayer, startMove):
     simBoard = deepcopy(board)
@@ -151,63 +148,35 @@ def simulateGame(simPlayer, startMove):
 
     if simPlayer == compChar:
         while len(emptySpots) > 0:
-            
             rPlayerMove = random.choice(emptySpots)
             simBoard[rPlayerMove[0]][rPlayerMove[1]] = playerChar
-            if checkPlayerWon(simBoard):
-                return False
-            
-            emptySpots = getSpots(hexChar, simBoard)
+            emptySpots.pop(emptySpots.index(rPlayerMove))
+
             if len(emptySpots) > 0:
                 rCompMove = random.choice(emptySpots)
                 simBoard[rCompMove[0]][rCompMove[1]] = compChar
-            if checkCompWon(simBoard):
+                emptySpots.pop(emptySpots.index(rCompMove))
+                
+        if checkPlayerWon(simBoard):
+                return False
+        if checkCompWon(simBoard):
                 return True
-            emptySpots = getSpots(hexChar, simBoard)
             
     elif simPlayer == playerChar:
         while len(emptySpots) > 0:
-            rPlayerMove = random.choice(emptySpots)
-            simBoard[rPlayerMove[0]][rPlayerMove[1]] = compChar
-            if checkCompWon(simBoard):
-                return False
-##            emptySpots = getSpots(hexChar, simBoard)
+            rCompMove = random.choice(emptySpots)
+            simBoard[rCompMove[0]][rCompMove[1]] = compChar
+            emptySpots.pop(emptySpots.index(rCompMove))
+
             if len(emptySpots) > 0:
-                rCompMove = random.choice(emptySpots)
-                simBoard[rCompMove[0]][rCompMove[1]] = playerChar
-            if checkPlayerWon(simBoard):
+                rPlayerMove = random.choice(emptySpots)
+                simBoard[rPlayerMove[0]][rPlayerMove[1]] = playerChar
+                emptySpots.pop(emptySpots.index(rPlayerMove))
+
+        if checkPlayerWon(simBoard):
                 return True
-            emptySpots = getSpots(hexChar, simBoard)
-
-##    print("Simulation board is full, but no winner. This shouldn't happen")
-    
-
-##def main():
-##    global turn
-##    global gameWon
-##    if turn == "player":
-##        printBoard(board)
-##        inputCoord = list(map(int, input("Enter coordinates: (x,y): ").split(".")))
-##        while not board[inputCoord[0]-1][inputCoord[1]-1] == hexChar:
-##            inputCoord = list(map(int, input("Enter coordinates: (x,y): ").split(".")))
-##        changeColour(playerChar, inputCoord[0]-1, inputCoord[1]-1)
-####        moveCoord = compMove(playerChar)
-####        changeColour(playerChar, moveCoord[0], moveCoord[1])
-##        printBoard(board)
-##        if checkPlayerWon(board):
-##            print("WHITE WINS!")
-##            printBoard(board)
-##            gameWon = True
-##        turn = "comp"
-##    elif turn == "comp":
-##        moveCoord = compMove(compChar)
-##        changeColour(compChar, moveCoord[0], moveCoord[1])
-####        printBoard(board)
-##        if checkCompWon(board):
-##            print("BLACK WINS!")
-##            printBoard(board)
-##            gameWon = True
-##        turn = "player"   
+        if checkCompWon(simBoard):
+                return False
 
 def play(c, ac):
     acl = [0,0]
@@ -222,6 +191,7 @@ def convertMove(move):
     s = "".join(move)
     return s
 
+
 while not cmdQuit:
     cmd = input().split(" ")
     
@@ -230,29 +200,34 @@ while not cmdQuit:
         print()
         
     elif cmd[0] == "version":
-##        print("=", str(version))
         print("= 1")
         print()
     elif cmd[0] == "genmove":
         if cmd[1] == "b" or cmd[1] == "black":
-            if not checkPlayerWon(board) and not checkCompWon(board):
-                move = compMove(compChar)
+            if checkPlayerWon(board) or checkCompWon(board):
+                print("= resign")
+                print()
+            else:
+                if profiling:
+                    cProfile.run('compMove(playerChar)')
+                    move = [2,2]
+                else: move = compMove(compChar)
                 changeColour(compChar, move[0], move[1])
                 fmove = convertMove(move)
                 print("= ", fmove)
                 print()
-            else:
+        elif cmd[1] == "w" or cmd[1] == "white":
+            if checkCompWon(board) or checkPlayerWon(board):
                 print("= resign")
                 print()
-        elif cmd[1] == "w" or cmd[1] == "white":
-            if not checkCompWon(board) and not checkPlayerWon(board):
-                move = compMove(playerChar)
+            else:
+                if profiling:
+                    cProfile.run('compMove(playerChar)')
+                    move = [2,2]
+                else: move = compMove(playerChar)
                 changeColour(playerChar, move[0], move[1])
                 fmove = convertMove(move)
                 print("= ", fmove)
-                print()
-            else:
-                print("= resign")
                 print()
         else:
             print("? invalid color")
