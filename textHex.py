@@ -43,12 +43,12 @@ def printBoard(b):
 def changeColour(c, x, y):
     board[x][y] = c
 
-def getAdj(colour,x,y,b):
+def getAdj(c,x,y,b):
     sameAdj = []
     for n in adjList:
         toCheck = [x + n[0], y + n[1]]
         if 0 <= toCheck[0] <= size - 1 and 0 <= toCheck[1] <= size - 1:
-            if b[toCheck[0]][toCheck[1]] == colour:
+            if b[toCheck[0]][toCheck[1]] == c:
                 sameAdj.append(toCheck)
 ##    sys.stderr.write("(" + str(x) + "," + str(y) + ") is adj to " + str(sameAdj))
     return sameAdj
@@ -79,9 +79,9 @@ def checkPlayerWon(b):
                 if adj in connectedToLeft and spot not in connectedToLeft:
                     playerSpots.pop(playerSpots.index(spot))
                     connectedToLeft.append(spot)
-    for spot in rightEdge:
-        if spot in connectedToLeft:
-            return True
+            for spot in rightEdge:
+                if spot in connectedToLeft:
+                    return True
     return False
 
 def checkCompWon(b):
@@ -102,9 +102,9 @@ def checkCompWon(b):
                 if adj in connectedToBottom and spot not in connectedToBottom:
                     compSpots.pop(compSpots.index(spot))
                     connectedToBottom.append(spot)
-    for spot in topEdge:
-        if spot in connectedToBottom:
-            return True
+            for spot in topEdge:
+                if spot in connectedToBottom:
+                    return True
     return False
     
 def compMove(c):
