@@ -162,7 +162,7 @@ def simulateGame(simPlayer, startMove):
                 rCompMove = random.choice(emptySpots)
                 simBoard[rCompMove[0]][rCompMove[1]] = compChar
                 emptySpots.pop(emptySpots.index(rCompMove))
-                
+            
         if checkPlayerWon(simBoard):
                 return False
         if checkCompWon(simBoard):
