@@ -2,7 +2,6 @@ version = 3.0
 import random
 import time
 import sys
-from copy import deepcopy
 import cProfile
 board = []
 gameWon = False
@@ -142,7 +141,14 @@ def compMove(c):
         return random.choice(possibleSpots)
 
 def simulateGame(simPlayer, startMove):
-    simBoard = deepcopy(board)
+    simBoard = []
+    for i in board:
+        n = []
+        for j in i:
+            n.append(j)
+        simBoard.append(n)
+    
+            
     simBoard[startMove[0]][startMove[1]] = simPlayer
     emptySpots = getSpots(hexChar, simBoard)
 
