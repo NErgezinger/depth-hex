@@ -1,6 +1,7 @@
-version = 2.4
+version = 2.5
 import random
 import time
+import os
 from copy import deepcopy
 # import numpy
 # import scipy.stats
@@ -10,8 +11,8 @@ hexChar = "*"
 compChar = "b"
 playerChar = "w"
 turn = "player"
-size = 3
-duration = 5
+size = 4
+duration = 1
 cmdQuit = False
 adjListo = [[0,1], #upRight
            [1,0], #right
@@ -84,9 +85,10 @@ def checkPlayerWon(b):
             adjSpots = getAdj(playerChar, spot[0], spot[1], b)
             for adj in adjSpots:
                 if adj in connectedToLeft and spot not in connectedToLeft:
+                    playerSpots.pop(playerSpots.index(spot))
                     connectedToLeft.append(spot)
-    for spot in connectedToLeft:
-        if spot in rightEdge:
+    for spot in rightEdge:
+        if spot in connectedToLeft:
             return True
     return False
 
@@ -106,10 +108,12 @@ def checkCompWon(b):
             adjSpots = getAdj(compChar, spot[0], spot[1], b)
             for adj in adjSpots:
                 if adj in connectedToBottom and spot not in connectedToBottom:
+                    compSpots.pop(compSpots.index(spot))
                     connectedToBottom.append(spot)
-    for spot in connectedToBottom:
-        if spot in topEdge:
+    for spot in topEdge:
+        if spot in connectedToBottom:
             return True
+    
     return False
     
 def compMove(c):
@@ -124,19 +128,19 @@ def compMove(c):
         winResultsCount.append(0)
 ##    print("Starting search for:", duration, "seconds")
     while startTime + duration > time.clock() or len(winResults) == 0:
-        for spot in emptySpots:
-            if startTime + duration < time.clock() and len(winResults) > 0: break
-            outcome = simulateGame(c, spot)
-            if outcome:
-                if spot in winResults:
-                    winResultsCount[winResults.index(spot)] += 1
-                else:
-                    winResults.append(spot)
-            count += 1
+        spot = random.choice(emptySpots)
+        if startTime + duration < time.clock() and len(winResults) > 0: break
+        outcome = simulateGame(c, spot)
+        if outcome:
+            if spot in winResults:
+                winResultsCount[winResults.index(spot)] += 1
+            else:
+                winResults.append(spot)
+        count += 1
             
     best = winResults[winResultsCount.index(max(winResultsCount))]
-##    print("Searched: ", count)
-##    print("Chosen position won:", max(winResultsCount), "times")
+##    print("Searched: " + str(count))
+##    print("Chosen position won:" + str(max(winResultsCount)) + "times")
     return best
 
 def simulateGame(simPlayer, startMove):
@@ -146,10 +150,12 @@ def simulateGame(simPlayer, startMove):
 
     if simPlayer == compChar:
         while len(emptySpots) > 0:
+            
             rPlayerMove = random.choice(emptySpots)
             simBoard[rPlayerMove[0]][rPlayerMove[1]] = playerChar
             if checkPlayerWon(simBoard):
                 return False
+            
             emptySpots = getSpots(hexChar, simBoard)
             if len(emptySpots) > 0:
                 rCompMove = random.choice(emptySpots)
@@ -157,13 +163,14 @@ def simulateGame(simPlayer, startMove):
             if checkCompWon(simBoard):
                 return True
             emptySpots = getSpots(hexChar, simBoard)
+            
     elif simPlayer == playerChar:
         while len(emptySpots) > 0:
             rPlayerMove = random.choice(emptySpots)
             simBoard[rPlayerMove[0]][rPlayerMove[1]] = compChar
             if checkCompWon(simBoard):
                 return False
-            emptySpots = getSpots(hexChar, simBoard)
+##            emptySpots = getSpots(hexChar, simBoard)
             if len(emptySpots) > 0:
                 rCompMove = random.choice(emptySpots)
                 simBoard[rCompMove[0]][rCompMove[1]] = playerChar
@@ -259,7 +266,7 @@ while not cmdQuit:
             print("= ")
             print()
         else:
-            print("? invalid color")
+            print("= ")
             print()
             
     elif cmd[0] == "undo":
@@ -294,7 +301,7 @@ while not cmdQuit:
             print("= B")
             print()
         else:
-            print("=")
+            print("= ")
             print()
 
     elif cmd[0] == "hexgui-analyze_commands":
