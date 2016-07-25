@@ -247,7 +247,7 @@ while not cmdQuit:
             print("? invalid color")
 
     elif cmd[0] == "play":
-        if cmd[1] == "b" or cmd[1] == "black":
+        if cmd[1] == "b" or cmd[1] == "black" and :
             play(compChar, cmd[2])
             print("= ")
             print()
