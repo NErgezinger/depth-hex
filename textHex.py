@@ -71,13 +71,13 @@ def checkPlayerWon(b):
     for rowNum,row in enumerate(b[0]):
         if row == playerChar:
             connectedToLeft.append([0,rowNum])
-    playerSpots = getSpots(playerChar, b)
-    for i in range(len(playerSpots)+1):
-        for spot in playerSpots:
+    
+    for conn in connectedToLeft:
+        adjConn = getAdj(playerChar, conn[0], conn[1], b)
+        for spot in adjConn:
             adjSpots = getAdj(playerChar, spot[0], spot[1], b)
             for adj in adjSpots:
                 if adj in connectedToLeft and spot not in connectedToLeft:
-                    playerSpots.pop(playerSpots.index(spot))
                     connectedToLeft.append(spot)
             for spot in rightEdge:
                 if spot in connectedToLeft:
@@ -94,13 +94,13 @@ def checkCompWon(b):
     for colNum,col in enumerate(b):
         if col[0] == compChar:
             connectedToBottom.append([colNum,0])
-    compSpots = getSpots(compChar, b)
-    for i in range(len(compSpots)+1):
-        for spot in compSpots:
+    
+    for conn in connectedToBottom:
+        adjConn = getAdj(compChar, conn[0], conn[1], b)
+        for spot in adjConn:
             adjSpots = getAdj(compChar, spot[0], spot[1], b)
             for adj in adjSpots:
                 if adj in connectedToBottom and spot not in connectedToBottom:
-                    compSpots.pop(compSpots.index(spot))
                     connectedToBottom.append(spot)
             for spot in topEdge:
                 if spot in connectedToBottom:
