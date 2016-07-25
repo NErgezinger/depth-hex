@@ -1,3 +1,4 @@
+#THIS IS THE OLD VERSION
 version = 2.5
 import random
 import time
