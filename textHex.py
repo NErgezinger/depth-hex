@@ -5,6 +5,7 @@ import time
 import sys
 import cProfile
 board = []
+history = []
 gameWon = False
 hexChar = "*"
 compChar = "b"
@@ -42,6 +43,12 @@ def printBoard(b):
 
 def changeColour(c, x, y):
     board[x][y] = c
+    history.append([x,y])
+
+def undo():
+    if len(history) > 0:
+        last = history.pop()
+        board[last[0]][last[1]] = hexChar
 
 def getAdj(c,x,y,b):
     sameAdj = []
@@ -148,8 +155,7 @@ def simulateGame(simPlayer, startMove):
         for j in i:
             n.append(j)
         simBoard.append(n)
-    
-            
+        
     simBoard[startMove[0]][startMove[1]] = simPlayer
     emptySpots = getSpots(hexChar, simBoard)
 
@@ -209,6 +215,7 @@ while not cmdQuit:
     elif cmd[0] == "version":
         print("= 1")
         print()
+        
     elif cmd[0] == "genmove":
         if cmd[1] == "b" or cmd[1] == "black":
             if checkPlayerWon(board) or checkCompWon(board):
@@ -253,6 +260,7 @@ while not cmdQuit:
             print()
             
     elif cmd[0] == "undo":
+        undo()
         print("= ")
         print()
 
