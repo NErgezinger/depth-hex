@@ -9,8 +9,8 @@ gameWon = False
 hexChar = "□"
 compChar = "⬡"
 playerChar = "⬢"
-turn = "player"
-size = 3
+turn = "comp"
+size = 5
 adjList = [[0,1], #upRight
            [1,0], #right
            [1,-1],#downRight
@@ -106,16 +106,18 @@ def compMove():
     winResult = []
     emptySpots = getSpots(hexChar, board)
     startTime = time.clock()
-    duration = 2
+    duration = 10
+    count = 0
     while startTime + duration > time.clock():
         for spot in emptySpots:
             outcome = simulateGame(compChar, spot)
             if outcome:
                 winResult.append(spot)
+            count += 1
     common = scipy.stats.mode(winResult)[0]
     common = common.astype(int)
     common = common[0]
-    print(common)
+    print("Searched: ", count)
     return common
 
 def simulateGame(simPlayer, startMove):
@@ -141,7 +143,14 @@ def simulateGame(simPlayer, startMove):
 
 def main():
     global turn
-    if turn == "player":
+    if turn == "comp":
+        moveCoord = compMove()
+        changeColour(compChar, moveCoord[0], moveCoord[1])
+        if checkCompWon(board):
+            print("YOU LOSE!")
+            gameWon = True
+        turn = "player"
+    elif turn == "player":
         printBoard(board)
         inputCoord = list(map(int, input("Enter coordinates: (x,y): ").split(".")))
         while not board[inputCoord[0]-1][inputCoord[1]-1] == hexChar:
@@ -151,14 +160,7 @@ def main():
             print("YOU WIN!")
             gameWon = True
         turn = "comp"
-    elif turn == "comp":
-        moveCoord = compMove()
-        print(moveCoord)
-        changeColour(compChar, moveCoord[0], moveCoord[1])
-        if checkCompWon(board):
-            print("YOU LOSE!")
-            gameWon = True
-        turn = "player"
+    
 
 while not gameWon:
     main()
