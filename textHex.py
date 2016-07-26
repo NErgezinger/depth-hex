@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 version = 3.0
 import random
 import time
