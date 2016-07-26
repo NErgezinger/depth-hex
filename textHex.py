@@ -2,6 +2,7 @@ import random
 import time
 import sys
 import cProfile
+import numpy as np
 board = []
 history = []
 gameWon = False
