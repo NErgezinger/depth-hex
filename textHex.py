@@ -1,4 +1,3 @@
-version = 3.0
 import random
 import time
 import sys
@@ -14,6 +13,7 @@ size = 5
 duration = 10
 cmdQuit = False
 profiling = False
+version = 3.0
 
 adjList = [[1,1], #upRight
            [1,0], #right
@@ -78,16 +78,17 @@ def checkPlayerWon(b):
         if row == playerChar:
             connectedToLeft.append([0,rowNum])
     
-    for conn in connectedToLeft:
-        adjConn = getAdj(playerChar, conn[0], conn[1], b)
-        for spot in adjConn:
-            adjSpots = getAdj(playerChar, spot[0], spot[1], b)
-            for adj in adjSpots:
-                if adj in connectedToLeft and spot not in connectedToLeft:
-                    connectedToLeft.append(spot)
-            for spot in rightEdge:
-                if spot in connectedToLeft:
-                    return True
+    
+    for spot in connectedToLeft:
+        if spot not in searched:
+            searched.append(spot)
+            adjSpot = getAdj(playerChar,spot[0],spot[1],b)
+            for adj in adjSpot:
+                connectedToLeft.append(adj)
+                    
+    for right in rightEdge:
+        if right in connectedToLeft:
+            return True
     return False
 
 def checkCompWon(b):
@@ -101,16 +102,15 @@ def checkCompWon(b):
         if col[0] == compChar:
             connectedToBottom.append([colNum,0])
     
-    for conn in connectedToBottom:
-        adjConn = getAdj(compChar, conn[0], conn[1], b)
-        for spot in adjConn:
-            adjSpots = getAdj(compChar, spot[0], spot[1], b)
-            for adj in adjSpots:
-                if adj in connectedToBottom and spot not in connectedToBottom:
-                    connectedToBottom.append(spot)
-            for spot in topEdge:
-                if spot in connectedToBottom:
-                    return True
+    for spot in connectedToBottom:
+        if spot not in searched:
+            searched.append(spot)
+            adjSpot = getAdj(compChar,spot[0],spot[1],b)
+            for adj in adjSpot:
+                connectedToBottom.append(adj)
+    for spot in topEdge:
+        if spot in connectedToBottom:
+            return True
     return False
     
 def compMove(c):
