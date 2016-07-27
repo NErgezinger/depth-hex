@@ -69,33 +69,31 @@ def getSpots(c,b):
     return spots
 
 def checkPlayerWon(b):
-    searched = []
+    searched = [] 
     connectedToLeft = []
-    playerSpots = []
     rightEdge = []
     for i in range(size):
         rightEdge.append([size-1,i])
     for rowNum,row in enumerate(b[0]):
         if row == playerChar:
             connectedToLeft.append([0,rowNum])
-    
-    
+            
     for spot in connectedToLeft:
         if spot not in searched:
             searched.append(spot)
             adjSpot = getAdj(playerChar,spot[0],spot[1],b)
             for adj in adjSpot:
                 connectedToLeft.append(adj)
-                    
+    
     for right in rightEdge:
         if right in connectedToLeft:
             return True
     return False
+    
 
 def checkCompWon(b):
     searched = []
     connectedToBottom = []
-    compSpots =[]
     topEdge = []
     for i in range(size):
         topEdge.append([i,size-1])
@@ -122,6 +120,7 @@ def compMove(c):
     possibleSpots = getSpots(hexChar, board)
     startTime = time.clock()
     count = 0
+    sys.stderr.write("Starting search for " + str(duration) + "s\n")
     for i in possibleSpots:
         winResultsCount.append(0)
         timesSearched.append(0)
@@ -203,7 +202,6 @@ def convertMove(move):
     move[1] = str(move[1])
     s = "".join(move)
     return s
-
 
 while not cmdQuit:
     cmd = input().split(" ")
