@@ -106,6 +106,7 @@ def checkBlackWon(b):
             adjSpot = getAdj(blackChar,spot[0],spot[1],b)
             for adj in adjSpot:
                 connectedToBottom.append(adj)
+                
     for spot in topEdge:
         if spot in connectedToBottom:
             return True
@@ -117,29 +118,22 @@ def compMove(c):
     winResultsCount = []
     timesSearched = []
     possibleSpots = getSpots(hexChar, board)
-    startTime = time.clock()
     count = 0
     sys.stderr.write("Starting search for " + str(duration) + "s\n")
     for i in possibleSpots:
         winResultsCount.append(0)
         timesSearched.append(0)
-    while startTime + duration > time.clock():
-        spot = random.choice(possibleSpots)
-        outcome = simulateGame(c, spot)
-        count += 1
-        if outcome:
-            winResultsCount[possibleSpots.index(spot)] += 1
-        timesSearched[possibleSpots.index(spot)] += 1
-    best = []
-    bestWinRate = 0
-    for i,spot in enumerate(possibleSpots):
-        winRate = (winResultsCount[i] / timesSearched[i])
-        if winRate > bestWinRate:
-            best = spot
-            bestWinRate = winRate
-            
-    sys.stderr.write("Searched: " + str(count) + "\n")
-    sys.stderr.write(str(best) + " won " + str(bestWinRate * 100) +"% of the time\n")
+    startTime = time.clock()
+    while time.clock() - startTime < duration:
+        for spot in possibleSpots:
+            outcome = simulateGame(c, spot)
+            count += 1
+            if outcome:
+                winResultsCount[possibleSpots.index(spot)] += 1
+                
+    best = possibleSpots[winResultsCount.index(max(winResultsCount))]
+    sys.stderr.write("Searched: " + str(count) + " in " + str(time.clock() - startTime) + "s\n")
+    sys.stderr.write(str(best) + " won " + str(max(winResultsCount)) +" times\n")
 
     if len(best) > 0:
         return best
@@ -161,28 +155,28 @@ def simulateGame(simPlayer, startMove):
         while len(emptySpots) > 0:
             rWhiteMove = random.choice(emptySpots)
             simBoard[rWhiteMove[0]][rWhiteMove[1]] = whiteChar
-            emptySpots.pop(emptySpots.index(rWhiteMove))
+            emptySpots.remove(rWhiteMove)
 
             if len(emptySpots) > 0:
                 rBlackMove = random.choice(emptySpots)
                 simBoard[rBlackMove[0]][rBlackMove[1]] = blackChar
-                emptySpots.pop(emptySpots.index(rBlackMove))
+                emptySpots.remove(rBlackMove)
             
-        if checkWhiteWon(simBoard):
-                return False
         if checkBlackWon(simBoard):
                 return True
+        if checkWhiteWon(simBoard):
+                return False
             
     elif simPlayer == whiteChar:
         while len(emptySpots) > 0:
             rBlackMove = random.choice(emptySpots)
             simBoard[rBlackMove[0]][rBlackMove[1]] = blackChar
-            emptySpots.pop(emptySpots.index(rBlackMove))
+            emptySpots.remove(rBlackMove)
 
             if len(emptySpots) > 0:
                 rWhiteMove = random.choice(emptySpots)
                 simBoard[rWhiteMove[0]][rWhiteMove[1]] = whiteChar
-                emptySpots.pop(emptySpots.index(rWhiteMove))
+                emptySpots.remove(rWhiteMove)
 
         if checkWhiteWon(simBoard):
                 return True
