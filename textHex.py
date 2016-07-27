@@ -7,9 +7,8 @@ board = []
 history = []
 gameWon = False
 hexChar = "*"
-compChar = "b"
-playerChar = "w"
-turn = "player"
+blackChar = "b"
+whiteChar = "w"
 size = 5
 duration = 10
 cmdQuit = False
@@ -68,20 +67,20 @@ def getSpots(c,b):
                 spots.append([colNum, rowNum])
     return spots
 
-def checkPlayerWon(b):
+def checkWhiteWon(b):
     searched = [] 
     connectedToLeft = []
     rightEdge = []
     for i in range(size):
         rightEdge.append([size-1,i])
     for rowNum,row in enumerate(b[0]):
-        if row == playerChar:
+        if row == whiteChar:
             connectedToLeft.append([0,rowNum])
             
     for spot in connectedToLeft:
         if spot not in searched:
             searched.append(spot)
-            adjSpot = getAdj(playerChar,spot[0],spot[1],b)
+            adjSpot = getAdj(whiteChar,spot[0],spot[1],b)
             for adj in adjSpot:
                 connectedToLeft.append(adj)
     
@@ -91,20 +90,20 @@ def checkPlayerWon(b):
     return False
     
 
-def checkCompWon(b):
+def checkBlackWon(b):
     searched = []
     connectedToBottom = []
     topEdge = []
     for i in range(size):
         topEdge.append([i,size-1])
     for colNum,col in enumerate(b):
-        if col[0] == compChar:
+        if col[0] == blackChar:
             connectedToBottom.append([colNum,0])
     
     for spot in connectedToBottom:
         if spot not in searched:
             searched.append(spot)
-            adjSpot = getAdj(compChar,spot[0],spot[1],b)
+            adjSpot = getAdj(blackChar,spot[0],spot[1],b)
             for adj in adjSpot:
                 connectedToBottom.append(adj)
     for spot in topEdge:
@@ -158,36 +157,36 @@ def simulateGame(simPlayer, startMove):
     simBoard[startMove[0]][startMove[1]] = simPlayer
     emptySpots = getSpots(hexChar, simBoard)
 
-    if simPlayer == compChar:
+    if simPlayer == blackChar:
         while len(emptySpots) > 0:
-            rPlayerMove = random.choice(emptySpots)
-            simBoard[rPlayerMove[0]][rPlayerMove[1]] = playerChar
-            emptySpots.pop(emptySpots.index(rPlayerMove))
+            rWhiteMove = random.choice(emptySpots)
+            simBoard[rWhiteMove[0]][rWhiteMove[1]] = whiteChar
+            emptySpots.pop(emptySpots.index(rWhiteMove))
 
             if len(emptySpots) > 0:
-                rCompMove = random.choice(emptySpots)
-                simBoard[rCompMove[0]][rCompMove[1]] = compChar
-                emptySpots.pop(emptySpots.index(rCompMove))
+                rBlackMove = random.choice(emptySpots)
+                simBoard[rBlackMove[0]][rBlackMove[1]] = blackChar
+                emptySpots.pop(emptySpots.index(rBlackMove))
             
-        if checkPlayerWon(simBoard):
+        if checkWhiteWon(simBoard):
                 return False
-        if checkCompWon(simBoard):
+        if checkBlackWon(simBoard):
                 return True
             
-    elif simPlayer == playerChar:
+    elif simPlayer == whiteChar:
         while len(emptySpots) > 0:
-            rCompMove = random.choice(emptySpots)
-            simBoard[rCompMove[0]][rCompMove[1]] = compChar
-            emptySpots.pop(emptySpots.index(rCompMove))
+            rBlackMove = random.choice(emptySpots)
+            simBoard[rBlackMove[0]][rBlackMove[1]] = blackChar
+            emptySpots.pop(emptySpots.index(rBlackMove))
 
             if len(emptySpots) > 0:
-                rPlayerMove = random.choice(emptySpots)
-                simBoard[rPlayerMove[0]][rPlayerMove[1]] = playerChar
-                emptySpots.pop(emptySpots.index(rPlayerMove))
+                rWhiteMove = random.choice(emptySpots)
+                simBoard[rWhiteMove[0]][rWhiteMove[1]] = whiteChar
+                emptySpots.pop(emptySpots.index(rWhiteMove))
 
-        if checkPlayerWon(simBoard):
+        if checkWhiteWon(simBoard):
                 return True
-        if checkCompWon(simBoard):
+        if checkBlackWon(simBoard):
                 return False
 
 def play(c, ac):
@@ -216,28 +215,28 @@ while not cmdQuit:
         
     elif cmd[0] == "genmove":
         if cmd[1] == "b" or cmd[1] == "black":
-            if checkPlayerWon(board) or checkCompWon(board):
+            if checkWhiteWon(board) or checkBlackWon(board):
                 print("= resign")
                 print()
             else:
                 if profiling:
-                    cProfile.run('compMove(playerChar)')
+                    cProfile.run('compMove(whiteChar)')
                     move = [2,2]
-                else: move = compMove(compChar)
-                changeColour(compChar, move[0], move[1])
+                else: move = compMove(blackChar)
+                changeColour(blackChar, move[0], move[1])
                 fmove = convertMove(move)
                 print("= ", fmove)
                 print()
         elif cmd[1] == "w" or cmd[1] == "white":
-            if checkCompWon(board) or checkPlayerWon(board):
+            if checkBlackWon(board) or checkWhiteWon(board):
                 print("= resign")
                 print()
             else:
                 if profiling:
-                    cProfile.run('compMove(playerChar)')
+                    cProfile.run('compMove(whiteChar)')
                     move = [2,2]
-                else: move = compMove(playerChar)
-                changeColour(playerChar, move[0], move[1])
+                else: move = compMove(whiteChar)
+                changeColour(whiteChar, move[0], move[1])
                 fmove = convertMove(move)
                 print("= ", fmove)
                 print()
@@ -249,11 +248,11 @@ while not cmdQuit:
             print("= ")
             print()
         elif cmd[1] == "b" or cmd[1] == "black":
-            play(compChar, cmd[2])
+            play(blackChar, cmd[2])
             print("= ")
             print()
         elif cmd[1] == "w" or cmd[1] == "white":
-            play(playerChar, cmd[2])
+            play(whiteChar, cmd[2])
             print("= ")
             print()
         else:
@@ -286,10 +285,10 @@ while not cmdQuit:
         cmdQuit = True
 
     elif cmd[0] == "final_score":
-        if checkPlayerWon(board):
+        if checkWhiteWon(board):
             print("= W")
             print()
-        elif checkCompWon(board):
+        elif checkBlackWon(board):
             print("= B")
             print()
         else:
