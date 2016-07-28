@@ -115,10 +115,11 @@ def compMove(c):
             count += 1
             if outcome:
                 winResultsCount[possibleSpots.index(spot)] += 1
+            else:
+                winResultsCount[possibleSpots.index(spot)] -= 1
                 
     best = possibleSpots[winResultsCount.index(max(winResultsCount))]
-    sys.stderr.write("Searched: " + str(count) + " in " + str(time.clock() - startTime) + "s\n")
-    sys.stderr.write(str(best) + " won " + str(max(winResultsCount)) +" times\n")
+    sys.stderr.write("Searched " + str(count) + " in " + str(time.clock() - startTime) + "s\n")
 
     if len(best) > 0:
         return best
@@ -148,9 +149,8 @@ def simulateGame(simPlayer, startMove):
                 emptySpots.remove(rBlackMove)
             
         if checkWin(simBoard, black):
-                return True
-        if checkWin(simBoard, white):
-                return False
+            return True
+        else: return False
             
     elif simPlayer == white:
         while len(emptySpots) > 0:
@@ -164,9 +164,8 @@ def simulateGame(simPlayer, startMove):
                 emptySpots.remove(rWhiteMove)
 
         if checkWin(simBoard, white):
-                return True
-        if checkWin(simBoard, black):
-                return False
+            return True
+        else: return False
 
 def play(c, ac):
     acl = [0,0]
