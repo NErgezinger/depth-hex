@@ -2,7 +2,6 @@ import random
 import time
 import sys
 import cProfile
-import numpy as np
 board = []
 history = []
 gameWon = False
@@ -71,26 +70,31 @@ def checkWin(b,c):
     searched = []
     connected = []
     goalEdge = []
-
+    
     if c == white:
+        #right
         for i in range(size):
-            goalEdge.append([size-1,i]) 
+            goalEdge.append([size-1,i])
+        #left
         for rowNum,row in enumerate(b[0]):
             if row == white:
                 connected.append([0,rowNum])
+        
     else:
+        #top
         for i in range(size):
-            goalEdge.append([i,size-1]) 
+            goalEdge.append([i,size-1])
+        #bottom
         for colNum,col in enumerate(b):
             if col[0] == black:
                 connected.append([colNum,0])
-
+    
     for spot in connected:
         if spot not in searched:
             searched.append(spot)
             adjSpot = getAdj(c,spot[0],spot[1],b)
             for adj in adjSpot:
-                connected.append(adj)
+                connected.append(adj)   
 
     for goal in goalEdge:
         if goal in connected:
@@ -120,7 +124,7 @@ def compMove(c):
                 
     best = possibleSpots[winResultsCount.index(max(winResultsCount))]
     sys.stderr.write("Searched " + str(count) + " in " + str(time.clock() - startTime) + "s\n")
-
+    
     if len(best) > 0:
         return best
     else:
@@ -147,7 +151,9 @@ def simulateGame(simPlayer, startMove):
                 rBlackMove = random.choice(emptySpots)
                 simBoard[rBlackMove[0]][rBlackMove[1]] = black
                 emptySpots.remove(rBlackMove)
-            
+##            if len(emptySpots) < 5:
+##                if checkWin(simBoard, black):
+##                    return True
         if checkWin(simBoard, black):
             return True
         else: return False
