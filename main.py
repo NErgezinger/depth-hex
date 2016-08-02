@@ -10,7 +10,7 @@ black = "b"
 white = "w"
 size = 5
 searchTime = 10
-maxSearches = 20000
+maxSearches = 50000
 cmdQuit = False
 profiling = False
 version = 3.0
@@ -31,6 +31,8 @@ def resetBoard(b):
         b.append(row)
     return b
 board = resetBoard(board)
+
+
 
 def printBoard(b):
     for i in range(size - 1, -1, -1):
@@ -80,7 +82,6 @@ def checkWin(b,c):
         for rowNum,row in enumerate(b[0]):
             if row == white:
                 connected.append([0,rowNum])
-        
     else:
         #top
         for i in range(size):
@@ -113,7 +114,8 @@ def compMove(c):
         winResultsCount.append(0)
         timesSearched.append(0)
     startTime = time.clock()
-    while count < maxSearches:
+##    while count < maxSearches:
+    while time.clock() - startTime < searchTime:
         for spot in possibleSpots:
             outcome = simulateGame(c, spot)
             count += 1
