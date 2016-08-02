@@ -10,6 +10,7 @@ black = "b"
 white = "w"
 size = 5
 searchTime = 10
+maxSearches = 20000
 cmdQuit = False
 profiling = False
 version = 3.0
@@ -102,18 +103,17 @@ def checkWin(b,c):
     return False
     
 def compMove(c):
-    global searchTime
     possibleSpots = []
     winResultsCount = []
     timesSearched = []
     possibleSpots = getSpots(hexChar, board)
     count = 0
-    sys.stderr.write("Starting search for " + str(searchTime) + "s\n")
+    sys.stderr.write("Starting search\n")
     for i in possibleSpots:
         winResultsCount.append(0)
         timesSearched.append(0)
     startTime = time.clock()
-    while time.clock() - startTime < searchTime:
+    while count < maxSearches:
         for spot in possibleSpots:
             outcome = simulateGame(c, spot)
             count += 1
