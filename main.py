@@ -32,8 +32,6 @@ def resetBoard(b):
     return b
 board = resetBoard(board)
 
-
-
 def printBoard(b):
     for i in range(size - 1, -1, -1):
         printRow = []
@@ -73,7 +71,7 @@ def checkWin(b,c):
     searched = []
     connected = []
     goalEdge = []
-    
+
     if c == white:
         #right
         for i in range(size):
@@ -90,19 +88,19 @@ def checkWin(b,c):
         for colNum,col in enumerate(b):
             if col[0] == black:
                 connected.append([colNum,0])
-    
+
     for spot in connected:
         if spot not in searched:
             searched.append(spot)
             adjSpot = getAdj(c,spot[0],spot[1],b)
             for adj in adjSpot:
-                connected.append(adj)   
+                connected.append(adj)
 
     for goal in goalEdge:
         if goal in connected:
             return True
     return False
-    
+
 def compMove(c):
     possibleSpots = []
     winResultsCount = []
@@ -123,10 +121,10 @@ def compMove(c):
                 winResultsCount[possibleSpots.index(spot)] += 1
             else:
                 winResultsCount[possibleSpots.index(spot)] -= 1
-                
+
     best = possibleSpots[winResultsCount.index(max(winResultsCount))]
     sys.stderr.write("Searched " + str(count) + " in " + str(time.clock() - startTime) + "s\n")
-    
+
     if len(best) > 0:
         return best
     else:
@@ -139,7 +137,7 @@ def simulateGame(simPlayer, startMove):
         for j in i:
             n.append(j)
         simBoard.append(n)
-        
+
     simBoard[startMove[0]][startMove[1]] = simPlayer
     emptySpots = getSpots(hexChar, simBoard)
 
@@ -159,7 +157,7 @@ def simulateGame(simPlayer, startMove):
         if checkWin(simBoard, black):
             return True
         else: return False
-            
+
     elif simPlayer == white:
         while len(emptySpots) > 0:
             rBlackMove = random.choice(emptySpots)
@@ -190,15 +188,15 @@ def convertMove(move):
 
 while not cmdQuit:
     cmd = input().split(" ")
-    
+
     if cmd[0] == "name":
         print("= depth-hex")
         print()
-        
+
     elif cmd[0] == "version":
         print("= 1")
         print()
-        
+
     elif cmd[0] == "genmove":
         if cmd[1] == "b" or cmd[1] == "black":
             if checkWin(board,white) or checkWin(board,black):
@@ -244,7 +242,7 @@ while not cmdQuit:
         else:
             print("= ")
             print()
-            
+
     elif cmd[0] == "undo":
         undo()
         print("= ")
@@ -284,4 +282,3 @@ while not cmdQuit:
     elif cmd[0] == "hexgui-analyze_commands":
         print("= ")
         print()
-    
