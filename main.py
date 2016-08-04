@@ -116,14 +116,23 @@ def compMove(c):
     while time.clock() - startTime < searchTime:
         for spot in possibleSpots:
             outcome = simulateGame(c, spot)
+            index = possibleSpots.index(spot)
+            timesSearched[index] += 1
             count += 1
             if outcome:
-                winResultsCount[possibleSpots.index(spot)] += 1
-            else:
-                winResultsCount[possibleSpots.index(spot)] -= 1
+                winResultsCount[index] += 1
 
-    best = possibleSpots[winResultsCount.index(max(winResultsCount))]
+    best = []
+    winRate = 0
+    bestWinRate = 0
+    for index, spot in enumerate(possibleSpots):
+        winRate = winResultsCount[index] / timesSearched[index]
+        if winRate > bestWinRate:
+            bestWinRate = winRate
+            best = spot
+        
     sys.stderr.write("Searched " + str(count) + " in " + str(time.clock() - startTime) + "s\n")
+    sys.stderr.write(str(best) + " won " + str(bestWinRate) + "% of random games\n")
 
     if len(best) > 0:
         return best
