@@ -10,7 +10,7 @@ black = "b"
 white = "w"
 size = 5
 searchTime = 10
-maxSearches = 50000
+maxSearches = 10000
 cmdQuit = False
 profiling = False
 version = 3.0
@@ -112,15 +112,15 @@ def compMove(c):
         winResultsCount.append(0)
         timesSearched.append(0)
     startTime = time.clock()
-##    while count < maxSearches:
-    while time.clock() - startTime < searchTime:
-        for spot in possibleSpots:
-            outcome = simulateGame(c, spot)
-            index = possibleSpots.index(spot)
-            timesSearched[index] += 1
-            count += 1
-            if outcome:
-                winResultsCount[index] += 1
+    while count < maxSearches:
+##    while time.clock() - startTime < searchTime:
+        spot = random.choice(possibleSpots)
+        outcome = simulateGame(c, spot)
+        index = possibleSpots.index(spot)
+        timesSearched[index] += 1
+        count += 1
+        if outcome:
+            winResultsCount[index] += 1
 
     best = []
     winRate = 0
@@ -132,7 +132,7 @@ def compMove(c):
             best = spot
         
     sys.stderr.write("Searched " + str(count) + " in " + str(time.clock() - startTime) + "s\n")
-    sys.stderr.write(str(best) + " won " + str(bestWinRate) + "% of random games\n")
+    sys.stderr.write(str(best) + " won " + str(bestWinRate * 100) + "% of random games\n")
 
     if len(best) > 0:
         return best
@@ -160,9 +160,7 @@ def simulateGame(simPlayer, startMove):
                 rBlackMove = random.choice(emptySpots)
                 simBoard[rBlackMove[0]][rBlackMove[1]] = black
                 emptySpots.remove(rBlackMove)
-##            if len(emptySpots) < 5:
-##                if checkWin(simBoard, black):
-##                    return True
+                
         if checkWin(simBoard, black):
             return True
         else: return False
