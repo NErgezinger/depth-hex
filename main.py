@@ -10,10 +10,10 @@ gameWon = False
 hexChar = "*"
 black = "b"
 white = "w"
-size = 3
+size = 5
 searchTime = 10
 maxSearches = 10000
-threads = 4
+threads = 8
 cmdQuit = False
 profiling = False
 version = 3.0
@@ -126,18 +126,17 @@ def compMove(c):
         spot = random.choice(possibleSpots)
         for s in range(threads):
             spots.append(spot)
-        outcomes = pool.map(partialFunc, spots)
-##        if count > 32:
+      
+        outcomes = list(pool.map(partialFunc, spots))
+##        print(outcomes)
+##        if count > 1000:
 ##            break
         index = possibleSpots.index(spot)
         timesSearched[index] += threads
         count += threads
-        
-        
-        for out in outcomes:
-            if out:
-                winResultsCount[index] += 1
-        
+        winResultsCount[index] += outcomes.count(True)
+##        print(timesSearched)
+##        print(winResultsCount)
 
     best = []
     winRate = 0
@@ -147,7 +146,7 @@ def compMove(c):
         if winRate > bestWinRate:
             bestWinRate = winRate
             best = spot
-        
+            
     sys.stderr.write("Searched " + str(count) + " in " + str(time.clock() - startTime) + "s\n")
     sys.stderr.write(str(best) + " won " + str(bestWinRate * 100) + "% of random games\n")
 
