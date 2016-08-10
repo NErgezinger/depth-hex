@@ -1,3 +1,5 @@
+from multiprocessing.dummy import Pool as ThreadPool
+from functools import partial
 import random
 import time
 import sys
@@ -8,9 +10,10 @@ gameWon = False
 hexChar = "*"
 black = "b"
 white = "w"
-size = 5
+size = 3
 searchTime = 10
 maxSearches = 10000
+threads = 4
 cmdQuit = False
 profiling = False
 version = 3.0
@@ -56,7 +59,7 @@ def getAdj(c,x,y,b):
         if 0 <= toCheck[0] <= size - 1 and 0 <= toCheck[1] <= size - 1:
             if b[toCheck[0]][toCheck[1]] == c:
                 sameAdj.append(toCheck)
-##    sys.stderr.write("(" + str(x) + "," + str(y) + ") is adj to " + str(sameAdj))
+##    sys.stderr.write("(" + str(x) + "," + str(y) + ") is adj to " + str(sameAdj) + "\n")
     return sameAdj
 
 def getSpots(c,b):
@@ -105,6 +108,10 @@ def compMove(c):
     possibleSpots = []
     winResultsCount = []
     timesSearched = []
+    spots = []
+    outcomes = []
+    pool = ThreadPool(threads)
+    partialFunc = partial(simulateGame, c)
     possibleSpots = getSpots(hexChar, board)
     count = 0
     sys.stderr.write("Starting search\n")
@@ -112,15 +119,25 @@ def compMove(c):
         winResultsCount.append(0)
         timesSearched.append(0)
     startTime = time.clock()
-    while count < maxSearches:
-##    while time.clock() - startTime < searchTime:
+##    while count < maxSearches:
+    while time.clock() - startTime < searchTime:
+        outcomes = []
+        spots = []
         spot = random.choice(possibleSpots)
-        outcome = simulateGame(c, spot)
+        for s in range(threads):
+            spots.append(spot)
+        outcomes = pool.map(partialFunc, spots)
+##        if count > 32:
+##            break
         index = possibleSpots.index(spot)
-        timesSearched[index] += 1
-        count += 1
-        if outcome:
-            winResultsCount[index] += 1
+        timesSearched[index] += threads
+        count += threads
+        
+        
+        for out in outcomes:
+            if out:
+                winResultsCount[index] += 1
+        
 
     best = []
     winRate = 0
