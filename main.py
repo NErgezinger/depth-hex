@@ -1,3 +1,5 @@
+from multiprocessing.dummy import Pool as ThreadPool
+from functools import partial
 import random
 import time
 import sys
@@ -11,6 +13,7 @@ white = "w"
 size = 5
 searchTime = 10
 maxSearches = 10000
+threads = 4
 cmdQuit = False
 profiling = False
 version = 3.0
@@ -101,7 +104,16 @@ def checkWin(b,c):
             return True
     return False
 
-def compMove(c):
+def compMove(c)
+    pool = ThreadPool(threads)
+    results = pool.map(depth, c)
+    totalTimeSearched = []
+    totalWinResults = []
+    
+    for i in range(threads):
+        
+
+def depth(c):
     possibleSpots = []
     winResultsCount = []
     timesSearched = []
@@ -134,10 +146,7 @@ def compMove(c):
     sys.stderr.write("Searched " + str(count) + " in " + str(time.clock() - startTime) + "s\n")
     sys.stderr.write(str(best) + " won " + str(bestWinRate * 100) + "% of random games\n")
 
-    if len(best) > 0:
-        return best
-    else:
-        return random.choice(possibleSpots)
+    return [winResultsCount, timesSearched, count]
 
 def simulateGame(simPlayer, startMove):
     simBoard = []
