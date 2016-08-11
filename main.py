@@ -1,3 +1,5 @@
+from multiprocessing.dummy import Pool as ThreadPool
+from functools import partial
 import random
 import time
 import sys
@@ -49,14 +51,20 @@ def undo():
         last = history.pop()
         board[last[0]][last[1]] = hexChar
 
+def checkAdj(c,b,s,a):
+    toCheck = [s[0] + a[0],s[1] + a[1]]
+    if 0 <= toCheck[0] <= size - 1 and 0 <= toCheck[1] <= size - 1:
+        if b[toCheck[0]][toCheck[1]] == c:
+            return toCheck
+
 def getAdj(c,x,y,b):
     sameAdj = []
-    for n in adjList:
-        toCheck = [x + n[0], y + n[1]]
-        if 0 <= toCheck[0] <= size - 1 and 0 <= toCheck[1] <= size - 1:
-            if b[toCheck[0]][toCheck[1]] == c:
-                sameAdj.append(toCheck)
-##    sys.stderr.write("(" + str(x) + "," + str(y) + ") is adj to " + str(sameAdj))
+    pool = ThreadPool(6)
+    spot = [x,y]
+    part = partial(checkAdj, c, b, spot)
+    sameAdj = pool.map(part, adjList)
+    sameAdj = list(filter(None,sameAdj))
+##    sys.stderr.write("(" + str(x) + "," + str(y) + ") is adj to " + str(sameAdj) + "\n")
     return sameAdj
 
 def getSpots(c,b):
