@@ -57,9 +57,10 @@ def checkAdj(c,b,s,a):
         if b[toCheck[0]][toCheck[1]] == c:
             return toCheck
 
+pool = ThreadPool(6)
 def getAdj(c,x,y,b):
     sameAdj = []
-    pool = ThreadPool(6)
+    
     spot = [x,y]
     part = partial(checkAdj, c, b, spot)
     sameAdj = pool.map(part, adjList)
@@ -79,6 +80,7 @@ def checkWin(b,c):
     searched = []
     connected = []
     goalEdge = []
+    adjSpot = []
 
     if c == white:
         #right
@@ -103,7 +105,6 @@ def checkWin(b,c):
             adjSpot = getAdj(c,spot[0],spot[1],b)
             for adj in adjSpot:
                 connected.append(adj)
-
     for goal in goalEdge:
         if goal in connected:
             return True
