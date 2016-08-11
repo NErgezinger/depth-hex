@@ -12,7 +12,7 @@ black = "b"
 white = "w"
 size = 5
 searchTime = 10
-maxSearches = 10000
+maxSearches = 1000
 threads = 4
 cmdQuit = False
 profiling = False
@@ -104,13 +104,47 @@ def checkWin(b,c):
             return True
     return False
 
-def compMove(c)
+def compMove(c):
     pool = ThreadPool(threads)
-    results = pool.map(depth, c)
-    totalTimeSearched = []
-    totalWinResults = []
-    
+    cl = []
     for i in range(threads):
+        cl.append(c)
+    results = pool.map(depth, cl)
+##    for i in results:
+##        print(i)
+    totalWinResults = []
+    totalTimeSearched = []
+    totalCount = 0
+    possibleSpots = getSpots(hexChar, board)
+    
+    for i in possibleSpots:
+        totalTimeSearched.append(0)
+        totalWinResults.append(0)
+
+    for t in range(threads):
+        for i, winResult in enumerate(results[t][0]):
+            totalWinResults[i] += winResult
+            
+    for t in range(threads):
+        for i, timeSearched in enumerate(results[t][1]):
+            totalTimeSearched[i] += timeSearched
+
+    for i, count in enumerate(results):        
+        totalCount += count[2]
+
+    best = []
+    winRate = 0
+    bestWinRate = 0
+    for index, spot in enumerate(possibleSpots):
+        winRate = totalWinResults[index] / totalTimeSearched[index]
+        if winRate > bestWinRate:
+            bestWinRate = winRate
+            best = spot
+        
+    sys.stderr.write("Searched " + str(totalCount)+ "\n")
+    sys.stderr.write(str(best) + " won " + str(bestWinRate * 100) + "% of random games\n")
+
+    return best
         
 
 def depth(c):
@@ -124,8 +158,8 @@ def depth(c):
         winResultsCount.append(0)
         timesSearched.append(0)
     startTime = time.clock()
-    while count < maxSearches:
-##    while time.clock() - startTime < searchTime:
+##    while count < maxSearches:
+    while time.clock() - startTime < searchTime:
         spot = random.choice(possibleSpots)
         outcome = simulateGame(c, spot)
         index = possibleSpots.index(spot)
@@ -134,6 +168,8 @@ def depth(c):
         if outcome:
             winResultsCount[index] += 1
 
+    return [winResultsCount, timesSearched, count]
+    
     best = []
     winRate = 0
     bestWinRate = 0
@@ -146,7 +182,7 @@ def depth(c):
     sys.stderr.write("Searched " + str(count) + " in " + str(time.clock() - startTime) + "s\n")
     sys.stderr.write(str(best) + " won " + str(bestWinRate * 100) + "% of random games\n")
 
-    return [winResultsCount, timesSearched, count]
+    
 
 def simulateGame(simPlayer, startMove):
     simBoard = []
