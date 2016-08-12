@@ -111,12 +111,13 @@ def compMove(c):
     for i in possibleSpots:
         winResultsCount.append(0)
         timesSearched.append(0)
+    numSpots = len(possibleSpots) - 1
     startTime = time.clock()
 ##    while count < maxSearches:
     while time.clock() - startTime < searchTime:
-        spot = random.choice(possibleSpots)
+        index = random.randint(0,numSpots)
+        spot = possibleSpots[index]
         outcome = simulateGame(c, spot)
-        index = possibleSpots.index(spot)
         timesSearched[index] += 1
         count += 1
         if outcome:
