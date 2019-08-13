@@ -12,7 +12,7 @@ size = 5
 searchTime = 10
 maxSearches = 10000
 cmdQuit = False
-profiling = False
+profiling = True
 version = 3.0
 
 adjList = [[1,1], #upRight
@@ -113,8 +113,8 @@ def compMove(c):
         timesSearched.append(0)
     numSpots = len(possibleSpots) - 1
     startTime = time.clock()
-##    while count < maxSearches:
-    while time.clock() - startTime < searchTime:
+    while count < maxSearches:
+    # while time.clock() - startTime < searchTime:
         index = random.randint(0,numSpots)
         spot = possibleSpots[index]
         outcome = simulateGame(c, spot)
@@ -212,7 +212,7 @@ while not cmdQuit:
                 print()
             else:
                 if profiling:
-                    cProfile.run('compMove(white)')
+                    cProfile.run('compMove(black)', sort='time')
                     move = [2,2]
                 else: move = compMove(black)
                 changeColour(black, move[0], move[1])
