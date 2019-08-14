@@ -2,6 +2,8 @@ import random
 import time
 import sys
 import cProfile
+from multiprocessing import Pool, cpu_count
+import numpy as np
 board = []
 history = []
 gameWon = False
@@ -12,7 +14,7 @@ size = 5
 searchTime = 10
 maxSearches = 10000
 cmdQuit = False
-profiling = True
+profiling = False
 version = 3.0
 
 adjList = [[1,1], #upRight
@@ -112,16 +114,19 @@ def compMove(c):
         winResultsCount.append(0)
         timesSearched.append(0)
     numSpots = len(possibleSpots) - 1
-    startTime = time.clock()
-    while count < maxSearches:
-    # while time.clock() - startTime < searchTime:
-        index = random.randint(0,numSpots)
-        spot = possibleSpots[index]
-        outcome = simulateGame(c, spot)
-        timesSearched[index] += 1
-        count += 1
-        if outcome:
-            winResultsCount[index] += 1
+    startTime = time.perf_counter()
+
+    p = Pool(int(cpu_count()))
+    pSize = 512
+
+    # while count < maxSearches:
+    while time.perf_counter() - startTime < searchTime:
+        for index, spot in enumerate(possibleSpots):
+            pArgs = np.full((pSize, 2), (c, spot))
+            outcomes = p.starmap(simulateGame, pArgs)
+            timesSearched[index] += pSize
+            count += pSize
+            winResultsCount[index] += np.count_nonzero(outcomes)
 
     best = []
     winRate = 0
@@ -132,8 +137,8 @@ def compMove(c):
             bestWinRate = winRate
             best = spot
         
-    sys.stderr.write("Searched " + str(count) + " in " + str(time.clock() - startTime) + "s\n")
-    sys.stderr.write(str(best) + " won " + str(bestWinRate * 100) + "% of random games\n")
+    sys.stderr.write("Searched " + str(count) + " in " + str(time.perf_counter() - startTime) + "s\n")
+    sys.stderr.write(str(best) + " won " + str(np.round(bestWinRate, 3) * 100) + "% of random games\n")
 
     if len(best) > 0:
         return best
